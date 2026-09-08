@@ -5954,6 +5954,9 @@ function setDirection(
 
 async function toggleFullscreen() {
 
+    const root = document.documentElement;
+    const body = document.body;
+
     try {
 
         const isFullscreen =
@@ -5962,18 +5965,23 @@ async function toggleFullscreen() {
 
         if (!isFullscreen) {
 
-            document.body.classList.add(
+            /*
+             * Add the mobile layout immediately.
+             * This also works when the browser does not
+             * allow the Fullscreen API.
+             */
+
+            body.classList.add(
                 "mobileFullscreen"
             );
 
             if (
-                document.documentElement.requestFullscreen
+                root.requestFullscreen
             ) {
 
                 try {
 
-                    await document.documentElement
-                        .requestFullscreen();
+                    await root.requestFullscreen();
 
                 } catch (error) {
 
@@ -5984,13 +5992,12 @@ async function toggleFullscreen() {
                 }
 
             } else if (
-                document.documentElement.webkitRequestFullscreen
+                root.webkitRequestFullscreen
             ) {
 
                 try {
 
-                    document.documentElement
-                        .webkitRequestFullscreen();
+                    root.webkitRequestFullscreen();
 
                 } catch (error) {
 
@@ -6004,9 +6011,9 @@ async function toggleFullscreen() {
 
         } else {
 
-            document.body.classList.remove(
-                "mobileFullscreen"
-            );
+            /*
+             * Exit real fullscreen first.
+             */
 
             if (
                 document.exitFullscreen
@@ -6016,7 +6023,13 @@ async function toggleFullscreen() {
 
                     await document.exitFullscreen();
 
-                } catch (error) {}
+                } catch (error) {
+
+                    console.log(
+                        "Exit fullscreen failed"
+                    );
+
+                }
 
             } else if (
                 document.webkitExitFullscreen
@@ -6026,19 +6039,42 @@ async function toggleFullscreen() {
 
                     document.webkitExitFullscreen();
 
-                } catch (error) {}
+                } catch (error) {
+
+                    console.log(
+                        "Webkit exit fullscreen failed"
+                    );
+
+                }
 
             }
 
+            body.classList.remove(
+                "mobileFullscreen"
+            );
         }
 
     } catch (error) {
 
-        document.body.classList.toggle(
-            "mobileFullscreen"
+        console.log(
+            "Fullscreen error:",
+            error
         );
 
+        /*
+         * Fallback for browsers that do not support
+         * the Fullscreen API.
+         */
+
+        body.classList.toggle(
+            "mobileFullscreen"
+        );
     }
+
+
+    /*
+     * Recalculate canvas after the screen size changes.
+     */
 
     setTimeout(() => {
 
@@ -6053,7 +6089,7 @@ async function toggleFullscreen() {
 
         }
 
-    }, 150);
+    }, 200);
 }
 
 /* =================================
