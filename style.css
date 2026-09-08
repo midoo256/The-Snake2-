@@ -12,17 +12,29 @@
 html,
 body {
     width: 100%;
+    min-width: 100%;
     height: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+
     overflow: hidden;
+
     background: #020202;
+
     font-family:
         Arial,
         Helvetica,
         sans-serif;
+
     color: #ffffff;
+
     user-select: none;
     -webkit-user-select: none;
+
     touch-action: none;
+
+    -webkit-text-size-adjust: 100%;
 }
 
 
@@ -730,17 +742,15 @@ body {
 
 #gameContainer {
     position: fixed;
-
-    top: 0;
-    left: 0;
+    inset: 0;
 
     width: 100vw;
     height: 100vh;
 
+    height: 100dvh;
+
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
     justify-content: center;
 
@@ -752,8 +762,9 @@ body {
     background: #020202;
 
     overflow: hidden;
-}
 
+    touch-action: none;
+}
 
 /* =================================
    TOP GAME UI
@@ -1205,8 +1216,12 @@ canvas {
     box-shadow:
         0 0 30px
         rgba(0,0,0,0.7);
-}
 
+    touch-action: none;
+
+    -webkit-user-select: none;
+    user-select: none;
+}
 
 /* =================================
    CONTROLS
@@ -1607,16 +1622,23 @@ canvas {
     /* MOBILE GAME */
 
     #gameContainer {
-        width: 100vw;
-        height: 100vh;
+    position: fixed;
+    inset: 0;
 
-        padding:
-            112px
-            8px
-            20px;
+    width: 100vw;
 
-        overflow: hidden;
-    }
+    height: 100vh;
+    height: 100dvh;
+
+    padding:
+        112px
+        8px
+        20px;
+
+    overflow: hidden;
+
+    touch-action: none;
+}
 
 
     /* SCORE / BEST */
@@ -1693,30 +1715,31 @@ canvas {
     /* MOBILE CANVAS */
 
     canvas {
-        width:
-            min(
-                calc(100vw - 16px),
-                calc(100vh - 125px)
-            );
+    width:
+        min(
+            calc(100vw - 16px),
+            calc(100dvh - 125px)
+        );
 
-        height:
-            min(
-                calc(100vw - 16px),
-                calc(100vh - 125px)
-            );
+    height:
+        min(
+            calc(100vw - 16px),
+            calc(100dvh - 125px)
+        );
 
-        max-width:
-            calc(100vw - 16px);
+    max-width:
+        calc(100vw - 16px);
 
-        max-height:
-            calc(100vh - 125px);
+    max-height:
+        calc(100dvh - 125px);
 
-        margin:
-            0 auto;
+    margin:
+        0 auto;
 
-        border-radius: 5px;
-    }
+    border-radius: 5px;
 
+    touch-action: none;
+}
 
     /* MOBILE CONTROLS */
 
@@ -2009,32 +2032,74 @@ canvas {
    FULLSCREEN
    ================================= */
 
+body.mobileFullscreen {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+
+    overflow: hidden;
+}
+
 body.mobileFullscreen #navbar {
     display: none !important;
 }
 
 body.mobileFullscreen #gameContainer {
-    padding-top: 80px;
+    position: fixed;
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+
+    padding:
+        65px
+        6px
+        10px;
+
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+body.mobileFullscreen canvas {
+    width:
+        min(
+            calc(100vw - 12px),
+            calc(100dvh - 75px)
+        );
+
+    height:
+        min(
+            calc(100vw - 12px),
+            calc(100dvh - 75px)
+        );
+
+    max-width:
+        calc(100vw - 12px);
+
+    max-height:
+        calc(100dvh - 75px);
 }
 
 body.mobileFullscreen #topBar {
-    top: 10px;
-
-    left: 10px;
-    right: 10px;
+    top: 8px;
+    left: 8px;
+    right: 8px;
 }
 
 body.mobileFullscreen #heartsBox {
-    top: 10px;
+    top: 8px;
     left: 50%;
-
     right: auto;
 
     transform:
         translateX(-50%);
 }
 
-
+body.mobileFullscreen #controls {
+    display: none;
+}
 /* =================================
    ACCESSIBILITY / TOUCH
    ================================= */
