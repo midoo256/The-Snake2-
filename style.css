@@ -2032,17 +2032,27 @@ canvas {
    FULLSCREEN
    ================================= */
 
-body.mobileFullscreen {
+   body.mobileFullscreen {
+    position: fixed;
+    inset: 0;
+
     width: 100vw;
     height: 100vh;
     height: 100dvh;
 
     overflow: hidden;
+
+    margin: 0;
+    padding: 0;
+
+    background: #020202;
 }
+
 
 body.mobileFullscreen #navbar {
     display: none !important;
 }
+
 
 body.mobileFullscreen #gameContainer {
     position: fixed;
@@ -2053,42 +2063,62 @@ body.mobileFullscreen #gameContainer {
     height: 100dvh;
 
     padding:
-        65px
+        58px
         6px
-        10px;
+        8px;
 
+    display: flex;
+
+    align-items: center;
     justify-content: center;
 
     overflow: hidden;
+
+    background: #020202;
 }
 
+
 body.mobileFullscreen canvas {
+    display: block;
+
     width:
         min(
             calc(100vw - 12px),
-            calc(100dvh - 75px)
+            calc(100dvh - 70px)
         );
 
     height:
         min(
             calc(100vw - 12px),
-            calc(100dvh - 75px)
+            calc(100dvh - 70px)
         );
 
     max-width:
         calc(100vw - 12px);
 
     max-height:
-        calc(100dvh - 75px);
+        calc(100dvh - 70px);
+
+    margin: 0 auto;
+
+    flex-shrink: 0;
+
+    touch-action: none;
 }
 
+
 body.mobileFullscreen #topBar {
+    position: absolute;
+
     top: 8px;
     left: 8px;
     right: 8px;
 }
 
+
 body.mobileFullscreen #heartsBox {
+    position: absolute;
+
     top: 8px;
     left: 50%;
     right: auto;
@@ -2097,9 +2127,11 @@ body.mobileFullscreen #heartsBox {
         translateX(-50%);
 }
 
+
 body.mobileFullscreen #controls {
-    display: none;
+    display: none !important;
 }
+
 /* =================================
    ACCESSIBILITY / TOUCH
    ================================= */
