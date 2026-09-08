@@ -603,7 +603,7 @@ function initAudio() {
             audioContext.createGain();
 
         audioMaster.gain.value =
-            0.16;
+            0.85;
 
         audioMaster.connect(
             audioContext.destination
@@ -5956,31 +5956,80 @@ async function toggleFullscreen() {
 
     try {
 
-        if (
-            !document.fullscreenElement
-        ) {
+        const isFullscreen =
+            document.fullscreenElement ||
+            document.webkitFullscreenElement;
+
+        if (!isFullscreen) {
+
+            document.body.classList.add(
+                "mobileFullscreen"
+            );
 
             if (
-                document.documentElement
-                    .requestFullscreen
+                document.documentElement.requestFullscreen
             ) {
 
-                await document
-                    .documentElement
-                    .requestFullscreen();
+                try {
 
-            } else {
+                    await document.documentElement
+                        .requestFullscreen();
 
-                document.body.classList
-                    .add(
-                        "mobileFullscreen"
+                } catch (error) {
+
+                    console.log(
+                        "Fullscreen API unavailable"
                     );
+
+                }
+
+            } else if (
+                document.documentElement.webkitRequestFullscreen
+            ) {
+
+                try {
+
+                    document.documentElement
+                        .webkitRequestFullscreen();
+
+                } catch (error) {
+
+                    console.log(
+                        "Webkit fullscreen unavailable"
+                    );
+
+                }
+
             }
 
         } else {
 
-            await document
-                .exitFullscreen();
+            document.body.classList.remove(
+                "mobileFullscreen"
+            );
+
+            if (
+                document.exitFullscreen
+            ) {
+
+                try {
+
+                    await document.exitFullscreen();
+
+                } catch (error) {}
+
+            } else if (
+                document.webkitExitFullscreen
+            ) {
+
+                try {
+
+                    document.webkitExitFullscreen();
+
+                } catch (error) {}
+
+            }
+
         }
 
     } catch (error) {
@@ -5988,27 +6037,24 @@ async function toggleFullscreen() {
         document.body.classList.toggle(
             "mobileFullscreen"
         );
+
     }
 
+    setTimeout(() => {
 
-    setTimeout(
-        () => {
+        resizeCanvas();
 
-            resizeCanvas();
+        if (
+            snake &&
+            food
+        ) {
 
-            if (
-                snake &&
-                food
-            ) {
+            draw();
 
-                draw();
-            }
+        }
 
-        },
-        100
-    );
+    }, 150);
 }
-
 
 /* =================================
    FULLSCREEN CHANGE
