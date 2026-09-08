@@ -108,7 +108,441 @@ let gameOverTimeout = null;
 
 let frameScale = 1;
 
+/* =================================
+   MENU & DIFFICULTY SYSTEM
+   ================================= */
 
+const mainMenu =
+    document.getElementById("mainMenu");
+
+const startGameBtn =
+    document.getElementById("startGameBtn");
+
+const difficultyMenu =
+    document.getElementById("difficultyMenu");
+
+const navbar =
+    document.getElementById("navbar");
+
+const gameContainer =
+    document.getElementById("gameContainer");
+
+/*
+   Difficulty settings
+
+   gameSpeed = milliseconds between moves
+   LOWER = FASTER
+
+   obstacleStart:
+   score at which obstacles begin
+
+   obstacleEvery:
+   how often a new obstacle appears
+
+   maxObstacles:
+   maximum number of obstacles
+*/
+
+const difficultySettings = {
+
+    easy: {
+
+        name: "EASY",
+
+        startSpeed: 150,
+
+        minSpeed: 85,
+
+        speedStep: 2,
+
+        obstacleStart: 10,
+
+        obstacleEvery: 7,
+
+        maxObstacles: 7,
+
+        bombStart: 18,
+
+        bombEvery: 10,
+
+        foodDifficulty: 0
+
+    },
+
+    medium: {
+
+        name: "MEDIUM",
+
+        startSpeed: 98,
+
+        minSpeed: 55,
+
+        speedStep: 3,
+
+        obstacleStart: 5,
+
+        obstacleEvery: 4,
+
+        maxObstacles: 14,
+
+        bombStart: 10,
+
+        bombEvery: 8,
+
+        foodDifficulty: 1
+
+    },
+
+    hard: {
+
+        name: "HARD",
+
+        startSpeed: 88,
+
+        minSpeed: 32,
+
+        speedStep: 4,
+
+        obstacleStart: 3,
+
+        obstacleEvery: 3,
+
+        maxObstacles: 21,
+
+        bombStart: 10,
+
+        bombEvery: 4,
+
+        foodDifficulty: 2
+
+    },
+
+    extreme: {
+
+        name: "EXTREME",
+
+        startSpeed: 60,
+
+        minSpeed: 20,
+
+        speedStep: 5,
+
+        obstacleStart: 2,
+
+        obstacleEvery: 2,
+
+        maxObstacles: 27,
+
+        bombStart: 5,
+
+        bombEvery: 2,
+
+        foodDifficulty: 4
+
+    }
+
+};
+
+let selectedDifficulty =
+    "medium";
+
+let currentDifficulty =
+    difficultySettings.medium;
+
+
+/* =================================
+   MENU MUSIC
+   ================================= */
+
+let menuMusicTimer = null;
+
+let menuMusicStep = 0;
+
+let menuMusicPlaying = false;
+
+
+/*
+   Original little synth melody.
+   No external audio file is required.
+*/
+
+const menuMelody = [
+
+    261.63, // C4
+    329.63, // E4
+    392.00, // G4
+    329.63, // E4
+
+    293.66, // D4
+    349.23, // F4
+    440.00, // A4
+    349.23, // F4
+
+    261.63, // C4
+    329.63, // E4
+    392.00, // G4
+    523.25, // C5
+
+    440.00, // A4
+    392.00, // G4
+    329.63, // E4
+    293.66  // D4
+
+];
+
+
+function playMenuNote() {
+
+    if (
+        !menuMusicPlaying
+    ) {
+        return;
+    }
+
+    if (
+        !audioContext ||
+        !audioMaster
+    ) {
+        return;
+    }
+
+    const frequency =
+        menuMelody[
+            menuMusicStep %
+            menuMelody.length
+        ];
+
+    menuMusicStep++;
+
+    tone(
+        frequency,
+        0.32,
+        "sine",
+        0.025
+    );
+
+    /*
+       Soft second note for a richer sound
+    */
+
+    setTimeout(
+        () => {
+
+            if (
+                !menuMusicPlaying
+            ) {
+                return;
+            }
+
+            tone(
+                frequency * 2,
+                0.18,
+                "triangle",
+                0.012
+            );
+
+        },
+        90
+    );
+}
+
+
+function startMenuMusic() {
+
+    initAudio();
+
+    if (
+        !audioContext
+    ) {
+        return;
+    }
+
+    stopMenuMusic();
+
+    menuMusicPlaying = true;
+
+    menuMusicStep = 0;
+
+    playMenuNote();
+
+    menuMusicTimer =
+        setInterval(
+            playMenuNote,
+            420
+        );
+}
+
+
+function stopMenuMusic() {
+
+    menuMusicPlaying = false;
+
+    if (
+        menuMusicTimer
+    ) {
+
+        clearInterval(
+            menuMusicTimer
+        );
+
+        menuMusicTimer = null;
+    }
+}
+
+
+/* =================================
+   SHOW MAIN MENU
+   ================================= */
+
+function showMainMenu() {
+
+    /* Stop everything */
+
+    gameRunning = false;
+
+    stopMenuMusic();
+
+
+    if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
+
+
+    if (gameOverTimeout) {
+        clearTimeout(gameOverTimeout);
+        gameOverTimeout = null;
+    }
+
+    if (feedbackTimer) {
+        clearTimeout(feedbackTimer);
+        feedbackTimer = null;
+    }
+
+
+    /* Reset visual/game effects */
+
+    deathAnimation = false;
+    specialBombExplosion = false;
+
+    specialBomb = null;
+
+    specialBombParticles = [];
+
+    particles = [];
+    foodParticles = [];
+    obstacleParticles = [];
+    heartParticles = [];
+
+    redFlash = 0;
+    obstacleFlash = 0;
+    screenShake = 0;
+
+    gameOverReady = false;
+
+
+    /* Hide game */
+
+    if (gameOver) {
+        gameOver.style.display = "none";
+    }
+
+    if (navbar) {
+        navbar.style.display = "none";
+    }
+
+    if (gameContainer) {
+        gameContainer.style.display = "none";
+    }
+
+
+    /* Reset MENU completely */
+
+    if (difficultyMenu) {
+        difficultyMenu.style.display = "none";
+    }
+
+    if (startGameBtn) {
+        startGameBtn.style.display = "block";
+    }
+
+    if (mainMenu) {
+        mainMenu.style.display = "flex";
+    }
+
+
+    /* Start menu music again */
+
+    startMenuMusic();
+}
+
+
+/* =================================
+   SHOW DIFFICULTY MENU
+   ================================= */
+function showDifficultyMenu() {
+    initAudio();
+
+    if (startGameBtn) {
+        startGameBtn.style.display = "none";
+    }
+
+    if (difficultyMenu) {
+        difficultyMenu.style.display = "flex";
+    }
+
+    startMenuMusic();
+}
+
+/* =================================
+   HIDE DIFFICULTY MENU
+   ================================= */
+
+function hideDifficultyMenu() {
+
+    if (difficultyMenu) {
+        difficultyMenu.style.display = "none";
+    }
+
+    if (startGameBtn) {
+        startGameBtn.style.display = "block";
+    }
+
+    startMenuMusic();
+}
+
+
+/* =================================
+   START SELECTED DIFFICULTY
+   ================================= */
+
+function startSelectedDifficulty(difficulty) {
+
+    if (!difficultySettings[difficulty]) {
+        return;
+    }
+
+    selectedDifficulty = difficulty;
+
+    currentDifficulty =
+        difficultySettings[difficulty];
+
+    stopMenuMusic();
+
+    if (mainMenu) {
+        mainMenu.style.display = "none";
+    }
+
+    if (navbar) {
+        navbar.style.display = "flex";
+    }
+
+    if (gameContainer) {
+        gameContainer.style.display = "block";
+    }
+
+    startGame();
+}
 /* =================================
    HEART SYSTEM
    ================================= */
@@ -1311,7 +1745,13 @@ function resizeCanvas() {
    START GAME
    ================================= */
 
+/* =================================
+   START GAME
+   ================================= */
+
 function startGame() {
+
+    stopMenuMusic();
 
     if (gameOverTimeout) {
 
@@ -1366,7 +1806,12 @@ function startGame() {
 
     score = 0;
 
-    gameSpeed = 115;
+    /*
+       Difficulty speed
+    */
+
+    gameSpeed =
+        currentDifficulty.startSpeed;
 
     gameRunning = true;
 
@@ -1458,6 +1903,13 @@ function startGame() {
     gameOver.style.display =
         "none";
 
+    touchActive = false;
+
+    touchDirectionLocked =
+        false;
+
+    touchPointerId = null;
+
     spawnFood();
 
     animationFrameId =
@@ -1465,7 +1917,6 @@ function startGame() {
             gameLoop
         );
 }
-
 
 /* =================================
    RESPawn AFTER DEATH
@@ -1533,11 +1984,17 @@ function respawnAfterDeath() {
 }
 
 
+
 /* =================================
    RESTART GAME
    ================================= */
 
 function restartGame() {
+
+    /*
+       PLAY AGAIN uses the same
+       difficulty that was selected.
+    */
 
     startGame();
 }
@@ -1553,9 +2010,17 @@ function placeFoodSafely() {
 
     let attempts = 0;
 
+    const difficultyLevel =
+        currentDifficulty.foodDifficulty || 0;
+
+    const head =
+        snake && snake[0]
+            ? snake[0]
+            : null;
+
     while (
         !valid &&
-        attempts < 500
+        attempts < 1000
     ) {
 
         attempts++;
@@ -1583,7 +2048,10 @@ function placeFoodSafely() {
                     part.y === food.y
             );
 
-        if (valid) {
+        if (
+            valid &&
+            obstacles.length
+        ) {
 
             valid =
                 !obstacles.some(
@@ -1616,6 +2084,54 @@ function placeFoodSafely() {
                     specialBomb.y === food.y
                 );
         }
+
+        /*
+           Make food harder to reach
+           on Hard / Extreme.
+        */
+
+        if (
+            valid &&
+            head &&
+            difficultyLevel > 0
+        ) {
+
+            const distance =
+                Math.abs(
+                    food.x - head.x
+                ) +
+                Math.abs(
+                    food.y - head.y
+                );
+
+            let minimumDistance = 0;
+
+            if (
+                difficultyLevel === 1
+            ) {
+
+                minimumDistance = 4;
+
+            } else if (
+                difficultyLevel === 2
+            ) {
+
+                minimumDistance = 7;
+
+            } else if (
+                difficultyLevel === 3
+            ) {
+
+                minimumDistance = 10;
+            }
+
+            if (
+                distance < minimumDistance
+            ) {
+
+                valid = false;
+            }
+        }
     }
 
     if (!valid) {
@@ -1626,7 +2142,6 @@ function placeFoodSafely() {
         };
     }
 }
-
 
 /* =================================
    FOOD
@@ -1667,12 +2182,9 @@ function spawnFood() {
 
 function spawnSpecialBomb() {
 
-    if (
-        specialBomb ||
-        specialBombSpawned
-    ) {
-        return;
-    }
+    if (specialBomb) {
+    return;
+}
 
     let valid = false;
 
@@ -1866,11 +2378,12 @@ function createSpecialBombAppearEffect(
 function drawSpecialBomb() {
 
     if (
-        !specialBomb ||
-        specialBombExplosion
-    ) {
-        return;
-    }
+    !specialBomb ||
+    specialBombExplosion ||
+    deathAnimation
+) {
+    return;
+}
 
     const x =
         specialBomb.x *
@@ -1901,7 +2414,7 @@ function drawSpecialBomb() {
 
     const size =
         tileSize *
-        0.74 *
+        1.15 *
         pulse;
 
     ctx.save();
@@ -3051,11 +3564,26 @@ function checkHeartSpawn() {
    OBSTACLE SYSTEM
    ================================= */
 
+/* =================================
+   OBSTACLE DIFFICULTY
+   ================================= */
+
 function shouldAddObstacle() {
 
     return (
-        score >= 4 &&
-        score % 4 === 0
+
+        score >=
+            currentDifficulty.obstacleStart
+
+        &&
+
+        (
+            score -
+            currentDifficulty.obstacleStart
+        ) %
+        currentDifficulty.obstacleEvery ===
+            0
+
     );
 }
 
@@ -3063,7 +3591,8 @@ function shouldAddObstacle() {
 function addObstacle() {
 
     if (
-        obstacleCount >= 14
+        obstacleCount >=
+        currentDifficulty.maxObstacles
     ) {
         return;
     }
@@ -4032,12 +4561,13 @@ function update() {
         }
 
 
-        gameSpeed =
-            Math.max(
-                48,
-                115 -
-                score * 3
-            );
+       gameSpeed =
+    Math.max(
+        currentDifficulty.minSpeed,
+        currentDifficulty.startSpeed -
+        score *
+        currentDifficulty.speedStep
+    );
 
 
         if (
@@ -4053,18 +4583,23 @@ function update() {
         checkHeartSpawn();
 
 
-        /* =================================
-           SPECIAL BOMB AT SCORE 10
-           ================================= */
+       /* =================================
+   SPECIAL BOMB
+   ================================= */
 
-        if (
-            score === 10 &&
-            !specialBombSpawned
-        ) {
+if (
+    score >= currentDifficulty.bombStart &&
+    !specialBomb &&
+    (
+        score -
+        currentDifficulty.bombStart
+    ) %
+    currentDifficulty.bombEvery === 0
+) {
 
-            spawnSpecialBomb();
+    spawnSpecialBomb();
 
-        }
+}
 
 
     } else {
@@ -5541,9 +6076,63 @@ document.addEventListener(
 
 
 /* =================================
-   START
+   INITIALIZE MENU
    ================================= */
 
 resizeCanvas();
 
-startGame();
+/*
+   Game must NOT start automatically.
+   Show the main menu first.
+*/
+
+gameRunning = false;
+
+gameOverReady = false;
+
+if (navbar) {
+
+    navbar.style.display =
+        "none";
+}
+
+if (gameContainer) {
+
+    gameContainer.style.display =
+        "none";
+}
+
+if (mainMenu) {
+
+    mainMenu.style.display =
+        "flex";
+}
+
+if (difficultyMenu) {
+
+    difficultyMenu.style.display =
+        "none";
+}
+
+/*
+   Menu music starts after the user
+   interacts with the page.
+*/
+
+document.addEventListener(
+    "pointerdown",
+    () => {
+
+        if (
+            mainMenu.style.display !==
+            "none"
+        ) {
+
+            startMenuMusic();
+        }
+
+    },
+    {
+        passive: true
+    }
+);
