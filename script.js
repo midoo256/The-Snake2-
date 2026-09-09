@@ -5971,7 +5971,6 @@ function setDirection(
     };
 }
 
-
 /* =================================
    FULLSCREEN
    ================================= */
@@ -5987,21 +5986,21 @@ async function toggleFullscreen() {
             document.fullscreenElement ||
             document.webkitFullscreenElement;
 
-        /*
-         * ENTER FULLSCREEN
-         */
+        /* =============================
+           ENTER FULLSCREEN
+           ============================= */
+
         if (!isFullscreen) {
 
             /*
-             * Enable our mobile fullscreen layout
-             * immediately.
+             * Enable mobile layout first.
              */
             body.classList.add(
                 "mobileFullscreen"
             );
 
             /*
-             * Try the standard Fullscreen API.
+             * Standard Fullscreen API
              */
             if (
                 root.requestFullscreen
@@ -6014,16 +6013,18 @@ async function toggleFullscreen() {
                 } catch (error) {
 
                     console.log(
-                        "Fullscreen API unavailable:",
+                        "Fullscreen API failed:",
                         error
                     );
 
                 }
 
+            }
+
             /*
-             * Safari / WebKit fallback.
+             * WebKit fallback
              */
-            } else if (
+            else if (
                 root.webkitRequestFullscreen
             ) {
 
@@ -6034,59 +6035,58 @@ async function toggleFullscreen() {
                 } catch (error) {
 
                     console.log(
-                        "WebKit fullscreen unavailable:",
+                        "WebKit fullscreen failed:",
                         error
                     );
 
                 }
+
             }
 
-        /*
-         * EXIT FULLSCREEN
-         */
-        } else {
+        }
 
-            if (
-                document.exitFullscreen
-            ) {
+        /* =============================
+           EXIT FULLSCREEN
+           ============================= */
 
-                try {
+        else {
+
+            try {
+
+                if (
+                    document.exitFullscreen
+                ) {
 
                     await document.exitFullscreen();
 
-                } catch (error) {
-
-                    console.log(
-                        "Exit fullscreen failed:",
-                        error
-                    );
-
                 }
 
-            } else if (
-                document.webkitExitFullscreen
-            ) {
-
-                try {
+                else if (
+                    document.webkitExitFullscreen
+                ) {
 
                     document.webkitExitFullscreen();
 
-                } catch (error) {
-
-                    console.log(
-                        "WebKit exit fullscreen failed:",
-                        error
-                    );
-
                 }
+
+            } catch (error) {
+
+                console.log(
+                    "Exit fullscreen failed:",
+                    error
+                );
+
             }
 
             body.classList.remove(
                 "mobileFullscreen"
             );
+
         }
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.log(
             "Fullscreen error:",
@@ -6094,30 +6094,113 @@ async function toggleFullscreen() {
         );
 
         /*
-         * CSS fullscreen fallback.
+         * CSS fallback
          */
         body.classList.toggle(
             "mobileFullscreen"
         );
+
     }
 
     /*
-     * Wait for the viewport to update,
-     * then resize the game.
+     * Resize after viewport update
      */
     setTimeout(() => {
 
         resizeCanvas();
 
         if (
+            typeof snake !== "undefined" &&
+            typeof food !== "undefined" &&
             snake &&
             food
         ) {
+
             draw();
+
         }
 
-    }, 150);
+    }, 200);
+
 }
+
+
+/* =================================
+   FULLSCREEN CHANGE
+   ================================= */
+
+document.addEventListener(
+    "fullscreenchange",
+    () => {
+
+        if (
+            !document.fullscreenElement
+        ) {
+
+            document.body.classList.remove(
+                "mobileFullscreen"
+            );
+
+        }
+
+        setTimeout(() => {
+
+            resizeCanvas();
+
+            if (
+                typeof snake !== "undefined" &&
+                typeof food !== "undefined" &&
+                snake &&
+                food
+            ) {
+
+                draw();
+
+            }
+
+        }, 100);
+
+    }
+);
+
+
+/* =================================
+   WEBKIT FULLSCREEN CHANGE
+   ================================= */
+
+document.addEventListener(
+    "webkitfullscreenchange",
+    () => {
+
+        if (
+            !document.webkitFullscreenElement
+        ) {
+
+            document.body.classList.remove(
+                "mobileFullscreen"
+            );
+
+        }
+
+        setTimeout(() => {
+
+            resizeCanvas();
+
+            if (
+                typeof snake !== "undefined" &&
+                typeof food !== "undefined" &&
+                snake &&
+                food
+            ) {
+
+                draw();
+
+            }
+
+        }, 100);
+
+    }
+);
 
 /* =================================
    FULLSCREEN CHANGE
