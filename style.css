@@ -1006,6 +1006,11 @@ body {
 
 }
 
+#topBar .scoreBox:last-child {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 
 
 /* =================================
@@ -1408,6 +1413,14 @@ canvas {
 
     display: block;
 
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
     width:
         min(
             calc(100vw - 40px),
@@ -1430,8 +1443,7 @@ canvas {
 
     flex-shrink: 0;
 
-    margin:
-        0 auto;
+    margin: 0;
 
     background: #090909;
 
@@ -1447,11 +1459,63 @@ canvas {
     touch-action: none;
 
     -webkit-user-select: none;
-
     user-select: none;
+}/* =================================
+   CANVAS
+   ================================= */
 
+canvas {
+
+    display: block;
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    width:
+        min(
+            calc(100vw - 40px),
+            calc(100vh - 160px),
+            780px
+        );
+
+    height:
+        min(
+            calc(100vw - 40px),
+            calc(100vh - 160px),
+            780px
+        );
+
+    max-width:
+        calc(100vw - 40px);
+
+    max-height:
+        calc(100vh - 160px);
+
+    flex-shrink: 0;
+
+    margin: 0;
+
+    background: #090909;
+
+    border:
+        1px solid #202020;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 0 30px
+        rgba(0,0,0,0.7);
+
+    touch-action: none;
+
+    -webkit-user-select: none;
+    user-select: none;
 }
-
 
 
 /* =================================
@@ -2027,11 +2091,7 @@ canvas {
        Keep visible on mobile
     */
 
-    #topBar .scoreBox:last-child {
-
-        display: block;
-
-    }
+   
 
 
 
@@ -2068,45 +2128,50 @@ canvas {
 
     }
 
+/* =================================
+   MOBILE CANVAS
+   ================================= */
 
+canvas {
 
-    /* MOBILE CANVAS */
+    display: block;
 
-    canvas {
+    position: absolute;
 
-        display: block;
+    left: 50%;
+    top: 50%;
 
-        width:
-            min(
-                calc(100vw - 16px),
-                calc(100dvh - 125px)
-            );
+    transform:
+        translate(-50%, -50%);
 
-        height:
-            min(
-                calc(100vw - 16px),
-                calc(100dvh - 125px)
-            );
+    width:
+        min(
+            calc(100vw - 16px),
+            calc(100dvh - 125px)
+        );
 
-        max-width:
-            calc(100vw - 16px);
+    height:
+        min(
+            calc(100vw - 16px),
+            calc(100dvh - 125px)
+        );
 
-        max-height:
-            calc(100dvh - 125px);
+    max-width:
+        calc(100vw - 16px);
 
-        margin:
-            0 auto;
+    max-height:
+        calc(100dvh - 125px);
 
-        border-radius: 5px;
+    margin: 0;
 
-        touch-action: none;
+    border-radius: 5px;
 
-        flex-shrink: 0;
+    touch-action: none;
 
-    }
+    flex-shrink: 0;
+}
 
-
-
+   
     /* MOBILE CONTROLS */
 
     #controls {
@@ -2568,7 +2633,13 @@ body.mobileFullscreen canvas {
 
     display: block !important;
 
-    position: relative !important;
+    position: absolute !important;
+
+    left: 50% !important;
+    top: 50% !important;
+
+    transform:
+        translate(-50%, -50%) !important;
 
     width:
         min(
@@ -2593,10 +2664,7 @@ body.mobileFullscreen canvas {
     flex-shrink: 0 !important;
 
     border-radius: 5px !important;
-
 }
-
-
 
 body.mobileFullscreen #topBar {
 
@@ -2623,9 +2691,15 @@ body.mobileFullscreen #topBar {
 
 
 body.mobileFullscreen #topBar .scoreBox {
-
     display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 
+body.mobileFullscreen #topBar .scoreBox:last-child {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 
