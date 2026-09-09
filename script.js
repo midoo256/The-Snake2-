@@ -1678,112 +1678,91 @@ highScoreElement.textContent =
 function resizeCanvas() {
 
     const isMobile =
-        window.matchMedia(
-            "(max-width: 700px)"
-        ).matches;
+        window.matchMedia("(max-width: 700px)").matches;
 
     const isFullscreen =
         !!(
             document.fullscreenElement ||
             document.webkitFullscreenElement
         ) ||
-        document.body.classList.contains(
-            "mobileFullscreen"
-        );
+        document.body.classList.contains("mobileFullscreen");
 
-
-    let width =
-        window.innerWidth;
-
-    let height =
-        window.innerHeight;
-
+    let width = window.innerWidth;
+    let height = window.innerHeight;
 
     /*
-       Mobile layout
-
-       Normal:
-       leave space for the navbar.
-
-       Fullscreen:
-       use the entire viewport.
-    */
-
-    if (isMobile) {
-
-        if (!isFullscreen) {
-
-            height -= 55;
-
-        }
-
+     * Use the real viewport height when available.
+     * This is more reliable on mobile browsers.
+     */
+    if (window.visualViewport) {
+        width = window.visualViewport.width;
+        height = window.visualViewport.height;
     }
 
+    /*
+     * Normal mobile mode:
+     * Leave room for the navbar / top UI.
+     *
+     * Fullscreen:
+     * Use the complete viewport.
+     */
+    if (isMobile && !isFullscreen) {
+        height -= 55;
+    }
 
     /*
-       Small safety margin
-    */
-
+     * Small safety margin.
+     */
     width -= 8;
     height -= 8;
 
-
-    const size =
-        Math.min(
-            width,
-            height
-        );
-
+    /*
+     * Make the canvas a perfect square
+     * and keep it aligned to the grid.
+     */
+    const size = Math.min(width, height);
 
     const newSize =
         Math.max(
             GRID,
-            Math.floor(
-                size / GRID
-            ) * GRID
+            Math.floor(size / GRID) * GRID
         );
 
-
     /*
-       Update canvas only when needed
-    */
-
+     * Update the internal canvas resolution.
+     */
     if (
         canvas.width !== newSize ||
         canvas.height !== newSize
     ) {
 
-        canvas.width =
-            newSize;
-
-        canvas.height =
-            newSize;
+        canvas.width = newSize;
+        canvas.height = newSize;
 
         tileSize =
-            canvas.width /
-            GRID;
+            canvas.width / GRID;
 
-        backgroundCache =
-            null;
-
-        backgroundCacheSize =
-            0;
+        backgroundCache = null;
+        backgroundCacheSize = 0;
     }
 
-
     /*
-       Force the canvas to stay centered
-       inside the game area.
-    */
+     * Let JavaScript control the actual displayed
+     * canvas size. This prevents CSS and JS from
+     * fighting each other.
+     */
+    canvas.style.width =
+        newSize + "px";
 
-    canvas.style.display =
-        "block";
+    canvas.style.height =
+        newSize + "px";
 
-    canvas.style.marginLeft =
-        "auto";
-
-    canvas.style.marginRight =
-        "auto";
+    canvas.style.display = "block";
+    canvas.style.position = "absolute";
+    canvas.style.left = "50%";
+    canvas.style.top = "50%";
+    canvas.style.transform =
+        "translate(-50%, -50%)";
 }
 
 /* =================================
@@ -6008,18 +5987,22 @@ async function toggleFullscreen() {
             document.fullscreenElement ||
             document.webkitFullscreenElement;
 
+        /*
+         * ENTER FULLSCREEN
+         */
         if (!isFullscreen) {
 
             /*
-             * Add the mobile layout immediately.
-             * This also works when the browser does not
-             * allow the Fullscreen API.
+             * Enable our mobile fullscreen layout
+             * immediately.
              */
-
             body.classList.add(
                 "mobileFullscreen"
             );
 
+            /*
+             * Try the standard Fullscreen API.
+             */
             if (
                 root.requestFullscreen
             ) {
@@ -6031,11 +6014,15 @@ async function toggleFullscreen() {
                 } catch (error) {
 
                     console.log(
-                        "Fullscreen API unavailable"
+                        "Fullscreen API unavailable:",
+                        error
                     );
 
                 }
 
+            /*
+             * Safari / WebKit fallback.
+             */
             } else if (
                 root.webkitRequestFullscreen
             ) {
@@ -6047,18 +6034,17 @@ async function toggleFullscreen() {
                 } catch (error) {
 
                     console.log(
-                        "Webkit fullscreen unavailable"
+                        "WebKit fullscreen unavailable:",
+                        error
                     );
 
                 }
-
             }
 
+        /*
+         * EXIT FULLSCREEN
+         */
         } else {
-
-            /*
-             * Exit real fullscreen first.
-             */
 
             if (
                 document.exitFullscreen
@@ -6071,7 +6057,8 @@ async function toggleFullscreen() {
                 } catch (error) {
 
                     console.log(
-                        "Exit fullscreen failed"
+                        "Exit fullscreen failed:",
+                        error
                     );
 
                 }
@@ -6087,11 +6074,11 @@ async function toggleFullscreen() {
                 } catch (error) {
 
                     console.log(
-                        "Webkit exit fullscreen failed"
+                        "WebKit exit fullscreen failed:",
+                        error
                     );
 
                 }
-
             }
 
             body.classList.remove(
@@ -6107,34 +6094,30 @@ async function toggleFullscreen() {
         );
 
         /*
-         * Fallback for browsers that do not support
-         * the Fullscreen API.
+         * CSS fullscreen fallback.
          */
-
         body.classList.toggle(
             "mobileFullscreen"
         );
     }
 
-
     /*
-     * Recalculate canvas after the screen size changes.
+     * Wait for the viewport to update,
+     * then resize the game.
      */
-
     setTimeout(() => {
 
-    resizeCanvas();
+        resizeCanvas();
 
-    if (
-        snake &&
-        food
-    ) {
+        if (
+            snake &&
+            food
+        ) {
+            draw();
+        }
 
-        draw();
-
-    }
-
-}, 100);
+    }, 150);
+}
 
 /* =================================
    FULLSCREEN CHANGE
@@ -6262,4 +6245,4 @@ document.addEventListener(
         passive: true
     }
 )
-};
+;
