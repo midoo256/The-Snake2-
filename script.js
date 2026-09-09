@@ -1677,34 +1677,63 @@ highScoreElement.textContent =
 
 function resizeCanvas() {
 
-    let width =
-        window.innerWidth - 8;
-
-    let height =
-        window.innerHeight - 8;
-
-    if (
+    const isMobile =
         window.matchMedia(
             "(max-width: 700px)"
-        ).matches
-    ) {
+        ).matches;
 
-        const navbarHeight =
-            document.fullscreenElement
-                ? 55
-                : 55;
+    const isFullscreen =
+        !!(
+            document.fullscreenElement ||
+            document.webkitFullscreenElement
+        ) ||
+        document.body.classList.contains(
+            "mobileFullscreen"
+        );
 
-        height =
-            window.innerHeight -
-            navbarHeight -
-            8;
+
+    let width =
+        window.innerWidth;
+
+    let height =
+        window.innerHeight;
+
+
+    /*
+       Mobile layout
+
+       Normal:
+       leave space for the navbar.
+
+       Fullscreen:
+       use the entire viewport.
+    */
+
+    if (isMobile) {
+
+        if (!isFullscreen) {
+
+            height -= 55;
+
+        }
+
     }
+
+
+    /*
+       Small safety margin
+    */
+
+    width -= 8;
+    height -= 8;
+
 
     const size =
         Math.min(
             width,
             height
         );
+
 
     const newSize =
         Math.max(
@@ -1714,32 +1743,48 @@ function resizeCanvas() {
             ) * GRID
         );
 
+
+    /*
+       Update canvas only when needed
+    */
+
     if (
-        canvas.width ===
-            newSize &&
-        canvas.height ===
-            newSize
+        canvas.width !== newSize ||
+        canvas.height !== newSize
     ) {
-        return;
+
+        canvas.width =
+            newSize;
+
+        canvas.height =
+            newSize;
+
+        tileSize =
+            canvas.width /
+            GRID;
+
+        backgroundCache =
+            null;
+
+        backgroundCacheSize =
+            0;
     }
 
-    canvas.width =
-        newSize;
 
-    canvas.height =
-        newSize;
+    /*
+       Force the canvas to stay centered
+       inside the game area.
+    */
 
-    tileSize =
-        canvas.width /
-        GRID;
+    canvas.style.display =
+        "block";
 
-    backgroundCache =
-        null;
+    canvas.style.marginLeft =
+        "auto";
 
-    backgroundCacheSize =
-        0;
+    canvas.style.marginRight =
+        "auto";
 }
-
 
 /* =================================
    START GAME
@@ -6078,19 +6123,18 @@ async function toggleFullscreen() {
 
     setTimeout(() => {
 
-        resizeCanvas();
+    resizeCanvas();
 
-        if (
-            snake &&
-            food
-        ) {
+    if (
+        snake &&
+        food
+    ) {
 
-            draw();
+        draw();
 
-        }
+    }
 
-    }, 200);
-}
+}, 100);
 
 /* =================================
    FULLSCREEN CHANGE
@@ -6217,4 +6261,5 @@ document.addEventListener(
     {
         passive: true
     }
-);
+)
+};
