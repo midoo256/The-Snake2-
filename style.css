@@ -758,6 +758,7 @@ body {
         135px
         20px
         25px;
+        
 
     background: #020202;
 
@@ -2064,7 +2065,6 @@ body.mobileFullscreen #gameContainer {
     height: 100vh;
     height: 100dvh;
 
-    margin: 0;
     padding: 0;
 
     display: flex;
@@ -2077,7 +2077,6 @@ body.mobileFullscreen #gameContainer {
 
     background: #020202;
 }
-
 
 body.mobileFullscreen canvas {
     display: block;
@@ -2107,13 +2106,20 @@ body.mobileFullscreen canvas {
 
 
 body.mobileFullscreen #topBar {
-    position: absolute;
+    position: fixed;
 
     top: 8px;
     left: 8px;
     right: 8px;
 
-    z-index: 20;
+    height: 55px;
+
+    z-index: 10000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
 }
 
 
