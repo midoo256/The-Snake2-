@@ -846,9 +846,10 @@ body {
     cursor: pointer;
 
     transition:
-        color 0.18s ease,
-        background 0.18s ease,
-        border-color 0.18s ease;
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 
 }
 
@@ -1406,61 +1407,6 @@ body {
 
 
 /* =================================
-   CANVAS
-   ================================= */
-
-canvas {
-
-    display: block;
-
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    transform:
-        translate(-50%, -50%);
-
-    width:
-        min(
-            calc(100vw - 40px),
-            calc(100vh - 160px),
-            780px
-        );
-
-    height:
-        min(
-            calc(100vw - 40px),
-            calc(100vh - 160px),
-            780px
-        );
-
-    max-width:
-        calc(100vw - 40px);
-
-    max-height:
-        calc(100vh - 160px);
-
-    flex-shrink: 0;
-
-    margin: 0;
-
-    background: #090909;
-
-    border:
-        1px solid #202020;
-
-    border-radius: 8px;
-
-    box-shadow:
-        0 0 30px
-        rgba(0,0,0,0.7);
-
-    touch-action: none;
-
-    -webkit-user-select: none;
-    user-select: none;
-}/* =================================
    CANVAS
    ================================= */
 
@@ -2569,10 +2515,10 @@ body.mobileFullscreen {
 
     position: fixed !important;
 
-    top: 0 !important;
-    left: 0 !important;
+    inset: 0 !important;
 
     width: 100vw !important;
+    width: 100dvw !important;
 
     height: 100vh !important;
     height: 100dvh !important;
@@ -2584,28 +2530,24 @@ body.mobileFullscreen {
 
     background: #020202 !important;
 
+    touch-action: none !important;
 }
-
 
 
 body.mobileFullscreen #navbar {
 
     display: none !important;
-
 }
-
 
 
 body.mobileFullscreen #gameContainer {
 
     position: fixed !important;
 
-    top: 0 !important;
-    left: 0 !important;
-
     inset: 0 !important;
 
     width: 100vw !important;
+    width: 100dvw !important;
 
     height: 100vh !important;
     height: 100dvh !important;
@@ -2615,18 +2557,15 @@ body.mobileFullscreen #gameContainer {
 
     display: flex !important;
 
-    flex-direction: column !important;
-
     align-items: center !important;
-
     justify-content: center !important;
 
     overflow: hidden !important;
 
     background: #020202 !important;
 
+    touch-action: none !important;
 }
-
 
 
 body.mobileFullscreen canvas {
@@ -2641,39 +2580,29 @@ body.mobileFullscreen canvas {
     transform:
         translate(-50%, -50%) !important;
 
-    width:
-        min(
-            calc(100vw - 12px),
-            calc(100dvh - 12px)
-        ) !important;
-
-    height:
-        min(
-            calc(100vw - 12px),
-            calc(100dvh - 12px)
-        ) !important;
-
-    max-width:
-        calc(100vw - 12px) !important;
-
-    max-height:
-        calc(100dvh - 12px) !important;
-
     margin: 0 !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    border-radius: 5px !important;
 
     flex-shrink: 0 !important;
 
-    border-radius: 5px !important;
+    touch-action: none !important;
 }
+
 
 body.mobileFullscreen #topBar {
 
     position: fixed !important;
 
-    top: 8px !important;
+    top: max(
+        8px,
+        env(safe-area-inset-top)
+    ) !important;
 
     left: 8px !important;
-
     right: 8px !important;
 
     height: 48px !important;
@@ -2683,32 +2612,38 @@ body.mobileFullscreen #topBar {
     display: flex !important;
 
     align-items: center !important;
-
     justify-content: space-between !important;
-
 }
-
 
 
 body.mobileFullscreen #topBar .scoreBox {
+
     display: block !important;
+
     visibility: visible !important;
+
     opacity: 1 !important;
 }
+
 
 body.mobileFullscreen #topBar .scoreBox:last-child {
+
     display: block !important;
+
     visibility: visible !important;
+
     opacity: 1 !important;
 }
-
 
 
 body.mobileFullscreen #heartsBox {
 
     position: fixed !important;
 
-    top: 8px !important;
+    top: max(
+        8px,
+        env(safe-area-inset-top)
+    ) !important;
 
     left: 50% !important;
 
@@ -2718,18 +2653,13 @@ body.mobileFullscreen #heartsBox {
         translateX(-50%) !important;
 
     z-index: 10001 !important;
-
 }
-
 
 
 body.mobileFullscreen #controls {
 
     display: none !important;
-
 }
-
-
 
 /* =================================
    ACCESSIBILITY / TOUCH
